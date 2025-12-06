@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibrarySync | Minimal Library Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-book"></i>
+                <h1>LibrarySync</h1>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-link active" data-section="dashboard">
+                        <i class="fas fa-home"></i> <span>Dashboard</span>
+                    </a></li>
+                    <li><a href="#" class="nav-link" data-section="books">
+                        <i class="fas fa-book"></i> <span>Books</span>
+                    </a></li>
+                    <li><a href="#" class="nav-link" data-section="members">
+                        <i class="fas fa-users"></i> <span>Members</span>
+                    </a></li>
+                    <li><a href="#" class="nav-link" data-section="loans">
+                        <i class="fas fa-exchange-alt"></i> <span>Loans</span>
+                        <span class="badge" id="active-loans-badge">0</span>
+                    </a></li>
+                    <li class="nav-divider"></li>
+                    <li><a href="#" class="nav-link nav-action" data-section="add-book">
+                        <i class="fas fa-plus"></i> <span>Add Book</span>
+                    </a></li>
+                    <li><a href="#" class="nav-link nav-action" data-section="add-member">
+                        <i class="fas fa-user-plus"></i> <span>Add Member</span>
+                    </a></li>
+                    <li><a href="#" class="nav-link nav-action" data-section="add-loan">
+                        <i class="fas fa-handshake"></i> <span>New Loan</span>
+                    </a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <div class="api-status">
+                    <span class="status-dot" id="status-dot"></span>
+                    <span id="api-status-text">Connecting...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="section-header">
+                <h2>Dashboard Overview</h2>
+                <p class="section-subtitle">Library statistics and recent activity</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card stat-primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Total Books</h3>
+                        <p class="stat-number" id="total-books">0</p>
+                        <p class="stat-desc">In collection</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card stat-success">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Active Members</h3>
+                        <p class="stat-number" id="total-members">0</p>
+                        <p class="stat-desc">Registered users</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card stat-warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Active Loans</h3>
+                        <p class="stat-number" id="active-loans">0</p>
+                        <p class="stat-desc">Currently borrowed</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card stat-danger">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Overdue</h3>
+                        <p class="stat-number" id="overdue-loans">0</p>
+                        <p class="stat-desc">Need attention</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Recent Activity</h3>
+                        <button class="btn-text" id="refresh-activity">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-list" id="activity-list">
+                            <!-- Activity will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Quick Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="quick-actions">
+                            <button class="btn-action btn-primary" data-section="add-book">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Add New Book</span>
+                            </button>
+                            <button class="btn-action btn-success" data-section="add-member">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Register Member</span>
+                            </button>
+                            <button class="btn-action btn-warning" data-section="add-loan">
+                                <i class="fas fa-handshake"></i>
+                                <span>Create Loan</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Books Section -->
+        <section id="books" class="section">
+            <div class="section-header">
+                <div>
+                    <h2>Books Management</h2>
+                    <p class="section-subtitle">Manage your library's book collection</p>
+                </div>
+                <div class="section-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="book-search" placeholder="Search books...">
+                    </div>
+                    <button class="btn-primary" id="refresh-books">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table id="books-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>ISBN</th>
+                                <th>Available</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="books-list">
+                            <!-- Books will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-footer">
+                    <div class="table-info">
+                        Showing <span id="books-count">0</span> books
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Members Section -->
+        <section id="members" class="section">
+            <div class="section-header">
+                <div>
+                    <h2>Members Management</h2>
+                    <p class="section-subtitle">Manage library members and their information</p>
+                </div>
+                <button class="btn-primary" id="refresh-members">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table id="members-table">
+                        <thead>
+                            <tr>
+                                <th>Member</th>
+                                <th>Email</th>
+                                <th>Joined</th>
+                                <th>Active Loans</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="members-list">
+                            <!-- Members will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loans Section -->
+        <section id="loans" class="section">
+            <div class="section-header">
+                <div>
+                    <h2>Loan Management</h2>
+                    <p class="section-subtitle">Track and manage book loans</p>
+                </div>
+                <div class="section-actions">
+                    <div class="filter-tabs">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="active">Active</button>
+                        <button class="filter-btn" data-filter="overdue">Overdue</button>
+                        <button class="filter-btn" data-filter="returned">Returned</button>
+                    </div>
+                    <button class="btn-primary" id="refresh-loans">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table id="loans-table">
+                        <thead>
+                            <tr>
+                                <th>Member</th>
+                                <th>Book</th>
+                                <th>Loaned</th>
+                                <th>Due</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="loans-list">
+                            <!-- Loans will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Book Form -->
+        <section id="add-book" class="section">
+            <div class="section-header">
+                <div>
+                    <h2>Add New Book</h2>
+                    <p class="section-subtitle">Add a new book to the library collection</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form id="add-book-form" class="modern-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="book-title">Title *</label>
+                                <input type="text" id="book-title" required placeholder="Enter book title">
+                                <div class="error-message" id="title-error"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="book-author">Author</label>
+                                <input type="text" id="book-author" placeholder="Enter author name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="book-isbn">ISBN *</label>
+                                <input type="text" id="book-isbn" required placeholder="Enter ISBN">
+                                <div class="error-message" id="isbn-error"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="book-copies">Copies *</label>
+                                <input type="number" id="book-copies" min="1" value="1" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-plus"></i> Add Book
+                            </button>
+                            <button type="reset" class="btn-secondary">
+                                Clear Form
+                            </button>
+                        </div>
+                        
+                        <div id="book-form-message" class="form-message"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Member Form -->
+        <section id="add-member" class="section">
+            <div class="section-header">
+                <div>
+                    <h2>Add New Member</h2>
+                    <p class="section-subtitle">Register a new library member</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form id="add-member-form" class="modern-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="member-name">Full Name *</label>
+                                <input type="text" id="member-name" required placeholder="Enter full name">
+                                <div class="error-message" id="name-error"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="member-email">Email *</label>
+                                <input type="email" id="member-email" required placeholder="member@example.com">
+                                <div class="error-message" id="email-error"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn-success">
+                                <i class="fas fa-user-plus"></i> Register Member
+                            </button>
+                            <button type="reset" class="btn-secondary">
+                                Clear Form
+                            </button>
+                        </div>
+                        
+                        <div id="member-form-message" class="form-message"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Create Loan Form -->
+        <section id="add-loan" class="section">
+            <div class="section-header">
+                <div>
+                    <h2>Create New Loan</h2>
+                    <p class="section-subtitle">Lend a book to a member</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form id="add-loan-form" class="modern-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="loan-member">Member *</label>
+                                <select id="loan-member" required>
+                                    <option value="">Select a member</option>
+                                    <!-- Members will be loaded here -->
+                                </select>
+                                <div class="error-message" id="member-error"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="loan-book">Book *</label>
+                                <select id="loan-book" required>
+                                    <option value="">Select a book</option>
+                                    <!-- Books will be loaded here -->
+                                </select>
+                                <div class="error-message" id="book-error"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="loan-due-date">Due Date *</label>
+                                <input type="date" id="loan-due-date" required>
+                                <div class="error-message" id="due-date-error"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn-warning">
+                                <i class="fas fa-handshake"></i> Create Loan
+                            </button>
+                            <button type="reset" class="btn-secondary">
+                                Clear Form
+                            </button>
+                        </div>
+                        
+                        <div id="loan-form-message" class="form-message"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Edit Record</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-form">
+                    <div id="edit-form-fields"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="edit-form" class="btn-primary">Save Changes</button>
+                <button type="button" class="btn-secondary modal-close">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Deletion</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <p id="delete-message">Are you sure you want to delete this item?</p>
+                <p class="warning-text">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="confirm-delete" class="btn-danger">Delete</button>
+                <button class="btn-secondary modal-close">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <footer>
+        <div class="container">
+            <p>LibrarySync &copy; 2024 | Backend API: <span id="api-url">https://library2-2.onrender.com/api</span></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
